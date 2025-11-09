@@ -1,5 +1,5 @@
 // src/services/api.js
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'https://product-management-crm.onrender.com/api';
 
 const getToken = () => localStorage.getItem('token');
 const setToken = (token) => localStorage.setItem('token', token);
