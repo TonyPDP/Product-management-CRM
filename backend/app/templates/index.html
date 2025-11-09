@@ -1,8 +1,0 @@
-<h2>Bosh sahifa</h2>
-{% if user.is_verified %}
-    <p>Salom, {{ user.username }}!</p>
-    <a href="{% url 'logout' %}">Chiqish</a>
-{% else %}
-    <p>Siz tizimga kirmagansiz.</p>
-    <a href="{% url 'login' %}">Kirish</a>
-{% endif %}

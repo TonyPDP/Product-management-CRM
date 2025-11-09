@@ -1,8 +1,0 @@
-<h2>Tizimga kirish</h2>
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="login" placeholder="Telefon yoki Email"><br>
-    <input type="password" name="password" placeholder="Parol"><br>
-    <button type="submit">Kirish</button>
-</form>
-<a href="{% url 'register' %}">Ro‘yxatdan o‘tish</a>
