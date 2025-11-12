@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
@@ -6,12 +5,44 @@ require("dotenv").config();
 
 const app = express();
 
+const allowedOrigins = [
+  "https://sparkling-lebkuchen-b1967a.netlify.app",
+  "http://localhost:3000",
+  "http://localhost:5173",  // Add this too
+];
+
 app.use(
   cors({
-    origin: "https://sparkling-lebkuchen-b1967a.netlify.app", // ✅ Fixed: removed trailing slash
+    origin: (origin, callback) => {
+      console.log('🌐 Request from origin:', origin);
+      
+      // Allow requests with no origin (Postman, curl, etc.)
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      // Allow whitelisted origins
+      if (allowedOrigins.includes(origin)) {
+        console.log('✅ Origin allowed:', origin);
+        return callback(null, true);
+      }
+      
+      // 🔧 DEVELOPMENT: Allow all localhost origins
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        console.log('✅ Allowing localhost origin:', origin);
+        return callback(null, true);
+      }
+      
+      console.warn("❌ CORS blocked origin:", origin);
+      callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
+
 app.use(express.json());
 
 // ============= HARDCODED AUTHORIZED USERS =============
