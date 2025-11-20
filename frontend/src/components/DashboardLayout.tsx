@@ -18,6 +18,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import NotificationPanel from "./NotificationPanel";
+import { notificationAPI } from "../services/api.js";
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -29,8 +32,26 @@ const DashboardLayout = () => {
   });
   const [activeItem, setActiveItem] = useState("dashboard");
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const data = await notificationAPI.getAll();
+        setUnreadCount(data.unreadCount);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleNavigation = (item) => {
     if (item.path) {
@@ -325,6 +346,9 @@ const DashboardLayout = () => {
                   variant="ghost"
                   size="sm"
                   className="relative hover:bg-white hover:shadow-md transition-all duration-300 rounded-xl p-3"
+                  onClick={() => {
+                    navigate("/payment");
+                  }}
                 >
                   <Plus size={20} className="text-gray-600" />
                 </Button>
@@ -332,13 +356,18 @@ const DashboardLayout = () => {
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={() => setNotificationOpen(true)}
                   className="relative hover:bg-white hover:shadow-md transition-all duration-300 rounded-xl p-3 group"
                 >
                   <Bell
                     size={20}
                     className="text-gray-600 group-hover:animate-bounce"
                   />
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full font-semibold animate-pulse">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Button>
 
                 {/* Language Selector */}
@@ -413,6 +442,10 @@ const DashboardLayout = () => {
                 </div>
               </div>
             </div>
+            <NotificationPanel
+              isOpen={notificationOpen}
+              onClose={() => setNotificationOpen(false)}
+            />
           </div>
         </header>
 
